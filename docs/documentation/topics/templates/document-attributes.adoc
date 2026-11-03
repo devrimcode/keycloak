@@ -18,6 +18,9 @@
 :on-prem:
 
 :project_images: keycloak-images
+:project_docs_path: nightly
+:pages_base_url: https://www.keycloak.org
+:docs_repo_edit_base: https://github.com/keycloak/keycloak/edit/main
 :project_doc_base_url: https://www.keycloak.org/docs/{project_version}
 :project_doc_base_url_latest: https://www.keycloak.org/docs/latest
 :project_dirref: KEYCLOAK_HOME
