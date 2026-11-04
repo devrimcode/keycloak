@@ -466,6 +466,7 @@ def validate_site(
     if not html_files:
         errors.append("No HTML files were produced")
     fragment_cache: OrderedDict[Path, set[str]] = OrderedDict()
+    api_docs_root = (site_root / "docs-api").resolve()
     for page in html_files:
         rel = page.relative_to(site_root).as_posix()
         content = page.read_text(encoding="utf-8")
@@ -498,7 +499,11 @@ def validate_site(
                 continue
             if not target.is_file():
                 errors.append(f"Broken local reference in {rel}: {ref}")
-            elif fragment and target.suffix.lower() in {".html", ".htm"}:
+            elif (
+                fragment
+                and target.suffix.lower() in {".html", ".htm"}
+                and not target.resolve().is_relative_to(api_docs_root)
+            ):
                 key = target.resolve()
                 ids = parser.ids if key == page.resolve() else fragment_cache.get(key)
                 if ids is None:
