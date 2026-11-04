@@ -143,7 +143,9 @@ class PagesPortableTests(unittest.TestCase):
         api_root = self.root / "api-docs"
         for name in ("javadocs", "rest-api"):
             (api_root / name).mkdir(parents=True)
-            (api_root / name / "index.html").write_text(f"<html><head></head><body>{name}</body></html>")
+            (api_root / name / "index.html").write_text(
+                f'<html><head></head><body>{name}<a href="#generated-reference">Generated link</a></body></html>'
+            )
         (api_root / "index.html").write_text("<html><head></head><body>API index</body></html>")
         self._zip_tree(api_root, api_dir / "keycloak-api-docs-test.zip", "keycloak-api-docs-test")
 
@@ -159,6 +161,14 @@ class PagesPortableTests(unittest.TestCase):
         guide.mkdir(parents=True)
         (guide / "index.html").write_text(self._guide_html("server_admin", extra='<a href="missing.html">broken</a>'))
         with self.assertRaisesRegex(RuntimeError, "Broken local reference"):
+            module.prepare(self._prepare_args("server_admin"))
+
+    def test_broken_guide_fragment_is_rejected(self) -> None:
+        guide = self.root / "docs/documentation/server_admin/target/generated-docs"
+        guide.mkdir(parents=True)
+        html = self._guide_html("server_admin", extra='<a href="#missing">broken fragment</a>')
+        (guide / "index.html").write_text(html)
+        with self.assertRaisesRegex(RuntimeError, "Missing fragment #missing"):
             module.prepare(self._prepare_args("server_admin"))
 
     def test_missing_edit_source_is_rejected(self) -> None:
